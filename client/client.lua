@@ -508,23 +508,31 @@ end)
 
 -- Command(s)
 
-RegisterCommand('reloadskin', function()
-	local playerPed = PlayerPedId()
-	local maxhealth = GetEntityMaxHealth(playerPed)
-	local health = GetEntityHealth(playerPed)
-	QBCore.Functions.TriggerCallback('fivem-appearance:getPlayerSkin', function(appearance)
-		exports['fivem-appearance']:setPlayerAppearance(appearance)
-	end)
-	for k, v in pairs(GetGamePool('CObject')) do
-        if IsEntityAttachedToEntity(PlayerPedId(), v) then
-            SetEntityAsMissionEntity(v, true, true)
-            DeleteObject(v)
-            DeleteEntity(v)
-        end
-	SetPedMaxHealth(PlayerId(), maxhealth)
-	Citizen.Wait(1000) -- Safety Delay
-	SetEntityHealth(PlayerPedId(), health)
-    end
+RegisterCommand("reloadskin", function()
+
+    local playerPed = PlayerPedId()
+    local maxhealth = GetEntityMaxHealth(playerPed)
+    local health = GetEntityHealth(playerPed)
+
+	PlayerData = QBCore.Functions.GetPlayerData()
+	local skin = 'mp_m_freemode_01'
+	if PlayerData.charinfo.gender == 1 then
+		skin = "mp_f_freemode_01"
+	end
+	local config = {
+		ped = true,
+		headBlend = true,
+		faceFeatures = true,
+		headOverlays = true,
+		components = true,
+		props = true,
+	}
+	QBCore.Functions.TriggerCallback('fivem-appearance:getPlayerSkin', function(appearance) --- trigger callback on setPlayerAppearance if not work
+	exports['fivem-appearance']:setPlayerAppearance(appearance, config)
+    	SetPedMaxHealth(PlayerId(), maxhealth)
+    	Citizen.Wait(1000) -- Safety Delay
+    	SetEntityHealth(PlayerPedId(), health)
+	end, true)
 end)
 
 -- Testing Command
